@@ -14,9 +14,9 @@ import {
 export const Route = createFileRoute("/dashboard/tabs/$tabId/")({
   head: () => ({
     meta: [
-      { title: "Tab Details — CUMAN LITE" },
+      { title: "Tab Details — Client Reports Hub" },
       { name: "description", content: "Review a tab and the reports assigned to it." },
-      { property: "og:title", content: "Tab Details — CUMAN LITE" },
+      { property: "og:title", content: "Tab Details — Client Reports Hub" },
       { property: "og:description", content: "Review a tab and the reports assigned to it." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

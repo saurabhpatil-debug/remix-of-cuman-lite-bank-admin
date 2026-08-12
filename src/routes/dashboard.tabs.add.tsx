@@ -9,9 +9,9 @@ import { addTab, isTabNameTaken } from "@/lib/store";
 export const Route = createFileRoute("/dashboard/tabs/add")({
   head: () => ({
     meta: [
-      { title: "Add Tab — CUMAN LITE" },
+      { title: "Add Tab — Client Reports Hub" },
       { name: "description", content: "Create a new report tab for the selected client." },
-      { property: "og:title", content: "Add Tab — CUMAN LITE" },
+      { property: "og:title", content: "Add Tab — Client Reports Hub" },
       {
         property: "og:description",
         content: "Create a new report tab for the selected client.",

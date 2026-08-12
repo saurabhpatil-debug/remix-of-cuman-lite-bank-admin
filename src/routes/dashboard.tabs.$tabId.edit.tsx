@@ -13,9 +13,9 @@ import { isTabNameTaken, updateTab } from "@/lib/store";
 export const Route = createFileRoute("/dashboard/tabs/$tabId/edit")({
   head: () => ({
     meta: [
-      { title: "Edit Tab — CUMAN LITE" },
+      { title: "Edit Tab — Client Reports Hub" },
       { name: "description", content: "Rename an existing report tab for the selected client." },
-      { property: "og:title", content: "Edit Tab — CUMAN LITE" },
+      { property: "og:title", content: "Edit Tab — Client Reports Hub" },
       {
         property: "og:description",
         content: "Rename an existing report tab for the selected client.",

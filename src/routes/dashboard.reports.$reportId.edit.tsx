@@ -13,9 +13,9 @@ import { updateReport, type ReportInput } from "@/lib/store";
 export const Route = createFileRoute("/dashboard/reports/$reportId/edit")({
   head: () => ({
     meta: [
-      { title: "Update Report — CUMAN LITE" },
+      { title: "Update Report — Client Reports Hub" },
       { name: "description", content: "Update a report's details and PDF attachment." },
-      { property: "og:title", content: "Update Report — CUMAN LITE" },
+      { property: "og:title", content: "Update Report — Client Reports Hub" },
       { property: "og:description", content: "Update a report's details and PDF attachment." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

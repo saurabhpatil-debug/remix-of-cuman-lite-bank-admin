@@ -14,9 +14,9 @@ import {
 export const Route = createFileRoute("/dashboard/reports/$reportId/")({
   head: () => ({
     meta: [
-      { title: "Report Details — CUMAN LITE" },
+      { title: "Report Details — Client Reports Hub" },
       { name: "description", content: "Review a report's details and its attached PDF." },
-      { property: "og:title", content: "Report Details — CUMAN LITE" },
+      { property: "og:title", content: "Report Details — Client Reports Hub" },
       { property: "og:description", content: "Review a report's details and its attached PDF." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
