@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { BarChart3, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { DataTable, type Column } from "@/components/dashboard/DataTable";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/excel";
@@ -92,6 +92,26 @@ export function ReportTable({
 
   const columns: Column<Report>[] = [
     ...baseColumns,
+    {
+      key: "viewReport",
+      header: "View Report",
+      width: "130px",
+      render: (row) => (
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-[hsl(20_90%_60%)] bg-[hsl(20_90%_97%)] text-[hsl(20_90%_50%)] hover:bg-[hsl(20_90%_94%)] hover:text-[hsl(20_90%_45%)]"
+          disabled={!row.pdf}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (row.pdf) window.open(row.pdf.dataUrl, "_blank", "noopener,noreferrer");
+          }}
+          title={row.pdf ? row.pdf.fileName : "No PDF uploaded"}
+        >
+          <BarChart3 className="size-3.5" /> Report
+        </Button>
+      ),
+    },
     {
       key: "action",
       header: "Action",
