@@ -4,13 +4,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { formatBytes } from "@/lib/excel";
 import type { HelpFileRecord } from "@/lib/store";
 
@@ -18,31 +11,23 @@ const MAX_BYTES = 4 * 1024 * 1024;
 
 export type TabFormValues = {
   name: string;
-  order: number;
   helpFile: HelpFileRecord | null;
 };
 
 export function TabForm({
   initialName,
-  initialOrder,
   initialHelpFile,
-  orderOptions,
   submitLabel,
   onSubmit,
   onCancel,
 }: {
   initialName: string;
-  initialOrder?: number | undefined;
   initialHelpFile?: HelpFileRecord | null | undefined;
-  orderOptions: number[];
   submitLabel: string;
   onSubmit: (values: TabFormValues) => boolean;
   onCancel: () => void;
 }) {
   const [name, setName] = useState(initialName);
-  const [order, setOrder] = useState(
-    String(initialOrder ?? orderOptions[orderOptions.length - 1] ?? 1),
-  );
   const [helpFile, setHelpFile] = useState<HelpFileRecord | null>(initialHelpFile ?? null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -77,7 +62,7 @@ export function TabForm({
           return;
         }
         setSaving(true);
-        const ok = onSubmit({ name, order: Number(order), helpFile });
+        const ok = onSubmit({ name, helpFile });
         if (!ok) setSaving(false);
       }}
     >
@@ -95,22 +80,6 @@ export function TabForm({
           autoFocus
         />
         {error ? <p className="text-xs break-words text-destructive">{error}</p> : null}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="tab-order">Order</Label>
-        <Select value={order} onValueChange={setOrder}>
-          <SelectTrigger id="tab-order" className="w-full sm:max-w-sm">
-            <SelectValue placeholder="Select order" />
-          </SelectTrigger>
-          <SelectContent>
-            {orderOptions.map((n) => (
-              <SelectItem key={n} value={String(n)}>
-                {n}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="flex flex-col items-start gap-3 rounded-xl border border-border bg-secondary/30 p-4">
