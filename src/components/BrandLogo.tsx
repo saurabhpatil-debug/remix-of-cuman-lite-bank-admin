@@ -10,7 +10,7 @@ export function BrandLogo({
   return (
     <img
       src={logoAsset.url}
-      alt="CUMAN LITE"
+      alt="Client Reports Hub"
       className={`${className} w-auto rounded-md object-contain ${showWordmark ? "" : "aspect-square"}`}
     />
   );

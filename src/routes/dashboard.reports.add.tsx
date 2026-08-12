@@ -12,9 +12,9 @@ export const Route = createFileRoute("/dashboard/reports/add")({
   }),
   head: () => ({
     meta: [
-      { title: "New Report — CUMAN LITE" },
+      { title: "New Report — Client Reports Hub" },
       { name: "description", content: "Create a report inside one of this client's tabs." },
-      { property: "og:title", content: "New Report — CUMAN LITE" },
+      { property: "og:title", content: "New Report — Client Reports Hub" },
       {
         property: "og:description",
         content: "Create a report inside one of this client's tabs.",

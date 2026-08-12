@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Layers, BarChart3, Menu, X, UserRound } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
-import { clearSession, type Client } from "@/lib/store";
+import { clearSession, getSession, type Client } from "@/lib/store";
 import { useClientContext } from "@/lib/useClientContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
@@ -18,14 +18,21 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { client } = useClientContext();
   const [activeClient, setActiveClient] = useState<Client | null>(client);
+  const [userName, setUserName] = useState("Admin");
+  const [userRole, setUserRole] = useState("Administrator");
 
   const orgName = activeClient?.name || "Client";
   const email = activeClient?.email || "";
-  const userName = "Yu Dai";
 
   useEffect(() => {
     setActiveClient(client);
   }, [client]);
+
+  useEffect(() => {
+    const session = getSession();
+    setUserName(session?.name || "Admin");
+    setUserRole(session?.role === "admin" ? "Administrator" : "Client user");
+  }, []);
 
   const handleLogout = () => {
     clearSession();
@@ -125,6 +132,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
+                  <p className="truncate text-xs text-muted-foreground">{userRole}</p>
                   <p className="truncate text-xs text-muted-foreground">{email || "—"}</p>
                 </div>
               </div>

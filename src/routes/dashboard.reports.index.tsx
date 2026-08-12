@@ -27,13 +27,13 @@ import { deleteReport, type Report } from "@/lib/store";
 export const Route = createFileRoute("/dashboard/reports/")({
   head: () => ({
     meta: [
-      { title: "Report Management — CUMAN LITE" },
+      { title: "Report Management — Client Reports Hub" },
       {
         name: "description",
         content:
           "Create and maintain Power BI reports and PDF attachments inside each client's tabs.",
       },
-      { property: "og:title", content: "Report Management — CUMAN LITE" },
+      { property: "og:title", content: "Report Management — Client Reports Hub" },
       {
         property: "og:description",
         content:

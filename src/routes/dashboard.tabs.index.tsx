@@ -19,12 +19,12 @@ import { deleteTab, type Tab } from "@/lib/store";
 export const Route = createFileRoute("/dashboard/tabs/")({
   head: () => ({
     meta: [
-      { title: "Tab Management — CUMAN LITE" },
+      { title: "Tab Management — Client Reports Hub" },
       {
         name: "description",
         content: "Create, rename, search and delete the report tabs that belong to each client.",
       },
-      { property: "og:title", content: "Tab Management — CUMAN LITE" },
+      { property: "og:title", content: "Tab Management — Client Reports Hub" },
       {
         property: "og:description",
         content: "Create, rename, search and delete the report tabs that belong to each client.",
