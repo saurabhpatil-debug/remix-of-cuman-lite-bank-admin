@@ -18,16 +18,21 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { client } = useClientContext();
   const [activeClient, setActiveClient] = useState<Client | null>(client);
+  const [userName, setUserName] = useState("Admin");
+  const [userRole, setUserRole] = useState("Administrator");
 
   const orgName = activeClient?.name || "Client";
   const email = activeClient?.email || "";
-  const session = getSession();
-  const userName = session?.name || "Admin";
-  const userRole = session?.role === "admin" ? "Administrator" : "Client user";
 
   useEffect(() => {
     setActiveClient(client);
   }, [client]);
+
+  useEffect(() => {
+    const session = getSession();
+    setUserName(session?.name || "Admin");
+    setUserRole(session?.role === "admin" ? "Administrator" : "Client user");
+  }, []);
 
   const handleLogout = () => {
     clearSession();
