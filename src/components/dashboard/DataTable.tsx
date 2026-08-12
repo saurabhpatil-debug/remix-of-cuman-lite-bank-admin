@@ -26,6 +26,7 @@ type Props<T> = {
   emptyMessage?: string;
   getRowKey: (row: T, index: number) => string;
   minWidth?: string;
+  headerClassName?: string;
 };
 
 export function DataTable<T extends Record<string, unknown>>({
@@ -36,6 +37,7 @@ export function DataTable<T extends Record<string, unknown>>({
   emptyMessage = "No records found.",
   getRowKey,
   minWidth,
+  headerClassName,
 }: Props<T>) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -96,7 +98,7 @@ export function DataTable<T extends Record<string, unknown>>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`bg-secondary px-2.5 py-2.5 text-left align-middle text-[10px] font-semibold tracking-normal whitespace-nowrap text-muted-foreground uppercase shadow-[inset_0_-1px_0_0_var(--border)] sm:px-3 sm:text-[11px] ${col.className ?? ""}`}
+                  className={`bg-secondary px-2.5 py-2.5 text-left align-middle whitespace-nowrap shadow-[inset_0_-1px_0_0_var(--border)] sm:px-3 ${headerClassName ?? "text-[10px] font-semibold tracking-normal text-muted-foreground uppercase sm:text-[11px]"} ${col.className ?? ""}`}
                 >
                   {col.header}
                 </th>

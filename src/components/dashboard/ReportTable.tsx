@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, FileText, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { DataTable, type Column } from "@/components/dashboard/DataTable";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/excel";
@@ -59,20 +59,16 @@ export function ReportTable({
       ),
     },
     {
-      key: "type",
-      header: "Type",
-      width: "90px",
-      render: (row) => (
-        <span className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-          <FileText className="size-3.5" /> {(row.type || "PDF").toUpperCase()}
-        </span>
-      ),
+      key: "uploadDate",
+      header: "Upload Date",
+      width: "130px",
+      className: "whitespace-nowrap",
+      render: (row) => formatDate(row.updatedAt),
     },
-
     {
       key: "balanceSheetDate",
       header: "Balance Sheet Date",
-      width: "140px",
+      width: "160px",
       className: "whitespace-nowrap",
       render: (row) =>
         row.balanceSheetDate ? (
@@ -84,52 +80,13 @@ export function ReportTable({
     {
       key: "comments",
       header: "Comments",
-      width: "280px",
+      width: "320px",
       render: (row) =>
         row.comments ? (
           <CommentCell text={row.comments} />
         ) : (
           <span className="text-muted-foreground">—</span>
         ),
-    },
-    {
-      key: "pdf",
-      header: "PDF",
-      width: "180px",
-      render: (row) =>
-        row.pdf ? (
-          <a
-            href={row.pdf.dataUrl}
-            target="_blank"
-            rel="noreferrer"
-            title={row.pdf.fileName}
-            className="flex min-w-0 items-center gap-1.5 text-primary underline-offset-4 hover:underline"
-          >
-            <FileText className="size-4 shrink-0" />{" "}
-            <span className="truncate">{row.pdf.fileName}</span>
-          </a>
-        ) : (
-          <span className="text-muted-foreground">Not uploaded</span>
-        ),
-    },
-    {
-      key: "fileSize",
-      header: "Size (MB)",
-      width: "90px",
-      className: "whitespace-nowrap",
-      render: (row) =>
-        row.pdf ? (
-          <span className="tabular-nums">{(row.pdf.size / (1024 * 1024)).toFixed(2)}</span>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        ),
-    },
-    {
-      key: "updatedAt",
-      header: "Updated",
-      width: "120px",
-      className: "whitespace-nowrap",
-      render: (row) => formatDate(row.updatedAt),
     },
   ];
 
@@ -182,6 +139,7 @@ export function ReportTable({
           columns={columns}
           rows={reports}
           getRowKey={(row) => row.id}
+          headerClassName="text-[12px] font-semibold tracking-normal text-primary sm:text-[13px]"
           searchPlaceholder="Search reports…"
           emptyMessage={
             canAdd ? "No reports in this tab yet." : "Add a tab first, then create reports."
