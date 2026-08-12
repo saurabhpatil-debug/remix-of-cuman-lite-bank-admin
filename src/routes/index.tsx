@@ -6,13 +6,13 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Tab Management — CUMAN LITE" },
+      { title: "Tab Management — Client Reports Hub" },
       {
         name: "description",
         content:
-          "Manage report tabs and reports for the selected client in CUMAN LITE.",
+          "Manage report tabs and reports for the selected client in Client Reports Hub.",
       },
-      { property: "og:title", content: "Tab Management — CUMAN LITE" },
+      { property: "og:title", content: "Tab Management — Client Reports Hub" },
       {
         property: "og:description",
         content: "Manage report tabs and reports for the selected client.",

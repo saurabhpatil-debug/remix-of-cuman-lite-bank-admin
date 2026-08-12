@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Layers, BarChart3, Menu, X, UserRound } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
-import { clearSession, type Client } from "@/lib/store";
+import { clearSession, getSession, type Client } from "@/lib/store";
 import { useClientContext } from "@/lib/useClientContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
@@ -21,7 +21,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   const orgName = activeClient?.name || "Client";
   const email = activeClient?.email || "";
-  const userName = "Yu Dai";
+  const session = getSession();
+  const userName = session?.name || "Admin";
+  const userRole = session?.role === "admin" ? "Administrator" : "Client user";
 
   useEffect(() => {
     setActiveClient(client);
@@ -125,6 +127,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
+                  <p className="truncate text-xs text-muted-foreground">{userRole}</p>
                   <p className="truncate text-xs text-muted-foreground">{email || "—"}</p>
                 </div>
               </div>
