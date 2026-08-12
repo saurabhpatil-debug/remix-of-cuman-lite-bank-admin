@@ -1,71 +1,32 @@
-# cuman-bank-admin
+# Client Reports Hub
 
-Create a responsive Super Admin Dashboard using React, TypeScript, and Tailwind CSS. Use JSON files as static data (no Supabase or backend).
+A responsive admin dashboard for managing clients, report tabs, Power BI configurations, and PDF attachments.
 
-Flow:
+Built with React, TypeScript, TanStack Start, and Tailwind CSS.
 
-Login page with Username and Password.
+## Features
 
-After login, open the Welcome Dashboard with a sidebar.
+- **Login**: Username + password authentication for admin and client users.
+- **Client context**: Works standalone or hand-in-hand with a client portal via `?clientId=` query parameters.
+- **Tab Management**: Create, rename, search, and delete report tabs per client.
+- **Report Management**: Add reports with Power BI details (Workspace ID, Report ID, Embed URL, Embed Token, Dataset ID) and optional PDF attachments.
+- **Responsive UI**: Sidebar navigation, searchable data tables, pagination, toast notifications, and mobile-friendly layouts.
 
-Sidebar menus:
+## Data & persistence
 
-Client Create (default selected)
-
-Client List
-
-Client Create page should display a Create Client button. Clicking it opens a form with:
-
-Name
-
-Username
-
-Email
-
-Password
-Validate required fields and unique Username/Email. On submit, save to JSON and redirect to Client List.
-
-Client List should display clients in a table with columns: Name, Username, Email, Created Date, and Action.
-
-The Action column should have an Upload Excel button. Clicking it opens an Upload Data page for that client.
-
-Upload an Excel (.xlsx/.xls), parse it, and display the data in dynamic tables.
-
-If the uploaded Excel contains multiple worksheets (tabs), automatically detect all sheet names, create a separate tab for each worksheet, and display the corresponding data under its respective tab. Generate table columns dynamically from each sheet's headers.
-
-Add an Action column for every row with two options:
-
-Upload PDF
-
-Configure Power BI
-
-Store PDF uploads and Power BI configurations separately for each worksheet and each row, ensuring data is correctly mapped to the selected client, sheet, and record.
-
-Upload PDF page should allow uploading a PDF and saving it for the selected row.
-
-Configure Power BI page should allow entering Report Name, Workspace ID, Report ID, Embed URL, Embed Token, and Dataset ID, then save the configuration for the selected row.
-
-Use a clean, responsive UI with a sidebar, header, searchable tables, pagination, toast notifications, and smooth page navigation. Ensure support for both single-sheet and multi-sheet Excel files.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://app-cuman-lite-admin.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/6e23b9c9-91d6-4403-8fb4-4a868d63e4ce).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+- Seed data lives in `src/data/` as static JSON.
+- On first load, seed data is copied to `localStorage` and IndexedDB (for PDF blobs); subsequent reads and writes go through the browser store so changes survive refresh.
+- Ready to migrate to Lovable Cloud if you need multi-user, persistent backend storage.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Prefer working locally? You need Node.js and a package manager such as `npm` or `bun`.
 
 ```sh
 git clone <this-repository-url>
-cd <repository-name>
+cd client-reports-hub
 npm i
 npm run dev
 ```
+
+This project was built with [Lovable](https://lovable.dev).
