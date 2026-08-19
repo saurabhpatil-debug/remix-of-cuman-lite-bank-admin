@@ -1,0 +1,32 @@
+[
+  {
+    "ClientTabsId": 1,
+    "ClientTabName": "BALANCE SHEET",
+    "ReportCount": 2,
+    "HelpFileURL": "",
+    "PDFURL": "",
+    "FileSize": "0",
+    "OrderLevel": 1,
+    "RowVersion": "AAAAAAAAB9E="
+  },
+  {
+    "ClientTabsId": 2,
+    "ClientTabName": "LIQUIDITY",
+    "ReportCount": 1,
+    "HelpFileURL": "",
+    "PDFURL": "",
+    "FileSize": "0",
+    "OrderLevel": 2,
+    "RowVersion": "AAAAAAAAB9I="
+  },
+  {
+    "ClientTabsId": 3,
+    "ClientTabName": "INTEREST RATE RISK",
+    "ReportCount": 1,
+    "HelpFileURL": "",
+    "PDFURL": "",
+    "FileSize": "0",
+    "OrderLevel": 3,
+    "RowVersion": "AAAAAAAAB9M="
+  }
+]

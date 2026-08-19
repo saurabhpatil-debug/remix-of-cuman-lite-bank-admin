@@ -1,0 +1,12 @@
+{
+  "ClientId": 1,
+  "ClientAdminId": 1,
+  "ClientName": "Cornerstone",
+  "Email": "admin@console.io",
+  "FirstName": "Super",
+  "LastName": "Admin",
+  "AdminGuid": "00000000-0000-0000-0000-000000000001",
+  "CreatedOn": "2026-01-01T09:00:00.000Z",
+  "IsActive": true,
+  "LogoURL": ""
+}
