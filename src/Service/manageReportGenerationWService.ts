@@ -1,135 +1,116 @@
 import { ClientPowerBiReportVM } from "../Model/ClientPowerBiReportVM.model";
-import { AuthService } from "../framework/auth.service";
-import { axiosInstanceGPGPost } from "../framework/InterceptedHttp/axiosInstance";
-
-const API_WRITE = "ManageReportW";
+import {
+  delay,
+  fileToObjectUrl,
+  makeRowVersion,
+  nextReportId,
+  reportRows,
+  syncReportCounts,
+  tabNameById,
+} from "@/lib/staticDb";
 
 export type DeleteReportPayload = {
   ClientPowerBiReportMappingId: number;
   RowVersion: string | Uint8Array | number[];
 };
 
-function toBase64(value: string | Uint8Array | number[]): string {
-  if (typeof value === "string") {
-    return value;
-  }
-
-  const bytes = value instanceof Uint8Array ? value : Uint8Array.from(value);
-  let binary = "";
-
-  for (let i = 0; i < bytes.length; i += 1) {
-    const currentByte = bytes[i];
-    if (currentByte === undefined) {
-      continue;
-    }
-
-    binary += String.fromCharCode(currentByte);
-  }
-
-  return btoa(binary);
-}
+/**
+ * Static (offline) replacements for the former ManageReportW endpoints.
+ * All data lives in memory, seeded from src/assets/data/reports.json.
+ */
 
 /**
  * CreateReport
- * Calls ManageReportW/CreateReport API
  */
 export async function CreateReport(
   objClientPowerBiReportVM: ClientPowerBiReportVM,
   pdfFile?: File | null,
-)
-{
-  const auth = await AuthService.getAuthToken();
-  const token = auth[0]?.id_token;
-  const formData = new FormData();
+) {
+  const displayName = String(objClientPowerBiReportVM.displayName ?? "").trim();
 
-  formData.append("ClientPowerBiReportMappingId", String(objClientPowerBiReportVM.clientPowerBiReportMappingId));
-  formData.append("DisplayName", objClientPowerBiReportVM.displayName);
-  formData.append("ClientTabsId", String(objClientPowerBiReportVM.clientTabsId));
-  formData.append("BalanceSheetDate", objClientPowerBiReportVM.balanceSheetDate);
-  formData.append("Comments", objClientPowerBiReportVM.comments);
-  formData.append("PDFURL", objClientPowerBiReportVM.pdfURL);
-  formData.append("FileSize", objClientPowerBiReportVM.fileSize);
-  formData.append("ArtifactTypeId", String(objClientPowerBiReportVM.artifactTypeId));
-  if (objClientPowerBiReportVM.rowVersion !== undefined && objClientPowerBiReportVM.rowVersion !== "") {
-    formData.append("RowVersion", toBase64(objClientPowerBiReportVM.rowVersion));
+  if (reportRows.some((row) => row.displayName.trim().toLowerCase() === displayName.toLowerCase())) {
+    throw new Error("Report already exists.");
   }
 
-  if (pdfFile) {
-    formData.append("pdfFile", pdfFile);
-  }
+  const clientTabId = Number(objClientPowerBiReportVM.clientTabsId);
+  const row = {
+    clientPowerBiReportMappingId: nextReportId(),
+    displayName,
+    tab: tabNameById(clientTabId),
+    balanceSheetDate: objClientPowerBiReportVM.balanceSheetDate ?? "",
+    comments: objClientPowerBiReportVM.comments ?? "",
+    pdf: fileToObjectUrl(pdfFile) || objClientPowerBiReportVM.pdfURL || null,
+    fileSize: objClientPowerBiReportVM.fileSize ?? "0",
+    updated: new Date().toISOString(),
+    rowVersion: makeRowVersion(),
+    artifactType: objClientPowerBiReportVM.artifactTypeId === 1 ? "Power BI" : "PDF",
+    clientTabId,
+    artifactTypeId: Number(objClientPowerBiReportVM.artifactTypeId) || 2,
+    pageNo: 1,
+    pageSize: 50,
+    totalRecords: reportRows.length + 1,
+  };
 
-  const response = await axiosInstanceGPGPost.post(
-    `${API_WRITE}/CreateReport`,
-    formData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    },
-  );
-  return response.data;
+  reportRows.push(row);
+  syncReportCounts();
+  return delay({ ...row });
 }
 
 /**
  * UpdateReport
- * Calls ManageReportW/UpdateReport API
  */
 export async function UpdateReport(
   objClientPowerBiReportVM: ClientPowerBiReportVM,
   pdfFile?: File | null,
-)
-{
-  const auth = await AuthService.getAuthToken();
-  const token = auth[0]?.id_token;
-  const formData = new FormData();
-
-  formData.append("ClientPowerBiReportMappingId", String(objClientPowerBiReportVM.clientPowerBiReportMappingId));
-  formData.append("DisplayName", objClientPowerBiReportVM.displayName);
-  formData.append("ClientTabsId", String(objClientPowerBiReportVM.clientTabsId));
-  formData.append("BalanceSheetDate", objClientPowerBiReportVM.balanceSheetDate);
-  // formData.append("Comments", objClientPowerBiReportVM.comments);
-  formData.append("Comments", objClientPowerBiReportVM.comments ?? "");
-  formData.append("PDFURL", objClientPowerBiReportVM.pdfURL);
-  formData.append("FileSize", objClientPowerBiReportVM.fileSize);
-  formData.append("ArtifactTypeId", String(objClientPowerBiReportVM.artifactTypeId));
-  if (objClientPowerBiReportVM.rowVersion !== undefined && objClientPowerBiReportVM.rowVersion !== "") {
-    formData.append("RowVersion", toBase64(objClientPowerBiReportVM.rowVersion));
-  }
-
-  if (pdfFile) {
-    formData.append("pdfFile", pdfFile);
-  }
-
-  const response = await axiosInstanceGPGPost.post(
-    `${API_WRITE}/UpdateReport`,
-    formData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    },
+) {
+  const row = reportRows.find(
+    (item) =>
+      item.clientPowerBiReportMappingId ===
+      Number(objClientPowerBiReportVM.clientPowerBiReportMappingId),
   );
-  return response.data;
+
+  if (!row) {
+    throw new Error("Report not found.");
+  }
+
+  const displayName = String(objClientPowerBiReportVM.displayName ?? "").trim();
+  if (
+    reportRows.some(
+      (item) =>
+        item.clientPowerBiReportMappingId !== row.clientPowerBiReportMappingId &&
+        item.displayName.trim().toLowerCase() === displayName.toLowerCase(),
+    )
+  ) {
+    throw new Error("Report Display Name already exists.");
+  }
+
+  const clientTabId = Number(objClientPowerBiReportVM.clientTabsId);
+  row.displayName = displayName;
+  row.clientTabId = clientTabId;
+  row.tab = tabNameById(clientTabId);
+  row.balanceSheetDate = objClientPowerBiReportVM.balanceSheetDate ?? row.balanceSheetDate;
+  row.comments = objClientPowerBiReportVM.comments ?? "";
+  row.pdf = fileToObjectUrl(pdfFile) || objClientPowerBiReportVM.pdfURL || row.pdf;
+  row.fileSize = objClientPowerBiReportVM.fileSize ?? row.fileSize;
+  row.artifactTypeId = Number(objClientPowerBiReportVM.artifactTypeId) || row.artifactTypeId;
+  row.artifactType = row.artifactTypeId === 1 ? "Power BI" : "PDF";
+  row.updated = new Date().toISOString();
+  row.rowVersion = makeRowVersion();
+
+  syncReportCounts();
+  return delay({ ...row });
 }
 
 /**
  * DeleteReport
- * Calls ManageReportW/DeleteReport API
  */
 export async function DeleteReport(payload: DeleteReportPayload) {
-  const auth = await AuthService.getAuthToken();
-  const token = auth[0]?.id_token;
-
-  const response = await axiosInstanceGPGPost.post(
-    `${API_WRITE}/DeleteReport`,
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
+  const index = reportRows.findIndex(
+    (item) => item.clientPowerBiReportMappingId === Number(payload.ClientPowerBiReportMappingId),
   );
-  return response.data;
+  if (index >= 0) {
+    reportRows.splice(index, 1);
+  }
+  syncReportCounts();
+  return delay({ success: true });
 }
