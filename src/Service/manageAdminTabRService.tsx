@@ -1,22 +1,19 @@
 import { ClientTabsReqVM } from "../Model/ClientTabsReqVM.model.tsx";
-import { AuthService } from "../framework/auth.service";
-import { axiosInstanceGPGGet } from "../framework/InterceptedHttp/axiosInstance";
+import { delay, syncReportCounts, tabRows } from "@/lib/staticDb";
 
 /**
  * GetAllTabsList
- * Calls ManageAdminTabR/GetAllTabsList API
+ * Static (offline) replacement for the former ManageAdminTabR/GetAllTabsList API.
  */
 export async function GetAllTabsList(objClientTabsReqVM: ClientTabsReqVM) {
-	const auth = await AuthService.getAuthToken();
-	const token = auth[0]?.id_token;
-	const response = await axiosInstanceGPGGet.get(
-		`ManageAdminTabR/GetAllTabsList`,
-		{
-			params: objClientTabsReqVM,
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}
-	);
-	return response.data;
+	syncReportCounts();
+
+	const search = String(objClientTabsReqVM?.["SearchTxt"] ?? "").trim().toLowerCase();
+	const rows = tabRows
+		.slice()
+		.sort((a, b) => a.OrderLevel - b.OrderLevel)
+		.filter((row) => (search ? row.ClientTabName.toLowerCase().includes(search) : true))
+		.map((row) => ({ ...row }));
+
+	return delay(rows);
 }

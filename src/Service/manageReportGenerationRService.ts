@@ -1,58 +1,54 @@
-import { AuthService } from "../framework/auth.service";
-import { axiosInstanceGPGGet } from "../framework/InterceptedHttp/axiosInstance";
 import type { ClientPowerBiReportReqVM } from "../Model/ClientPowerBiReportReqVM.model";
+import { artifactRows, delay, reportRows, tabRows } from "@/lib/staticDb";
 
 /**
  * GetTabsListDropDown
- * Calls ManageReportR/GetTabsListDropDown API
+ * Static (offline) replacement for ManageReportR/GetTabsListDropDown.
  */
 export async function GetTabsListDropDown() {
-	const auth = await AuthService.getAuthToken();
-	const token = auth[0]?.id_token;
-	const response = await axiosInstanceGPGGet.get(
-		`ManageReportR/GetTabsListDropDown`,
-		{
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}
-	);
-	return response.data;
+	const rows = tabRows
+		.slice()
+		.sort((a, b) => a.OrderLevel - b.OrderLevel)
+		.map((row) => ({
+			ClientTabsId: row.ClientTabsId,
+			ClientTabName: row.ClientTabName,
+		}));
+
+	return delay(rows);
 }
 
 /**
  * GetArtifactListDropDown
- * Calls ManageReportR/GetArtifactListDropDown API
+ * Static (offline) replacement for ManageReportR/GetArtifactListDropDown.
  */
 export async function GetArtifactListDropDown() {
-	const auth = await AuthService.getAuthToken();
-	const token = auth[0]?.id_token;
-	const response = await axiosInstanceGPGGet.get(
-		`ManageReportR/GetArtifactListDropDown`,
-		{
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}
-	);
-	return response.data;
+	return delay(artifactRows.map((row) => ({ ...row })));
 }
 
 /**
  * GetALLReportList
- * Calls ManageReportR/GetALLReportList API
+ * Static (offline) replacement for ManageReportR/GetALLReportList.
  */
 export async function GetALLReportList(objClientPowerBiReportReqVM: ClientPowerBiReportReqVM) {
-	const auth = await AuthService.getAuthToken();
-	const token = auth[0]?.id_token;
-	const response = await axiosInstanceGPGGet.get(
-		`ManageReportR/GetALLReportList`,
-		{
-			params: objClientPowerBiReportReqVM,
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		}
-	);
-	return response.data;
+	const { clientTabId, pageNo = 1, pageSize = 50, searchTxt = "" } = objClientPowerBiReportReqVM ?? {};
+	const search = String(searchTxt ?? "").trim().toLowerCase();
+
+	const filtered = reportRows
+		.filter((row) => (clientTabId ? row.clientTabId === clientTabId : true))
+		.filter((row) =>
+			search
+				? row.displayName.toLowerCase().includes(search) ||
+					(row.comments ?? "").toLowerCase().includes(search)
+				: true,
+		);
+
+	const start = (Math.max(pageNo, 1) - 1) * Math.max(pageSize, 1);
+	const paged = filtered.slice(start, start + Math.max(pageSize, 1)).map((row) => ({
+		...row,
+		pageNo,
+		pageSize,
+		totalRecords: filtered.length,
+	}));
+
+	return delay(paged);
 }
