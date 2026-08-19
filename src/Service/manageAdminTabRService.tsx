@@ -5,7 +5,7 @@ import { delay, syncReportCounts, tabRows } from "@/lib/staticDb";
  * GetAllTabsList
  * Static (offline) replacement for the former ManageAdminTabR/GetAllTabsList API.
  */
-export async function GetAllTabsList(objClientTabsReqVM: ClientTabsReqVM) {
+export async function GetAllTabsList(objClientTabsReqVM: ClientTabsReqVM): Promise<any> {
 	syncReportCounts();
 
 	const search = String(objClientTabsReqVM?.["SearchTxt"] ?? "").trim().toLowerCase();

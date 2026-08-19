@@ -5,7 +5,7 @@ import { artifactRows, delay, reportRows, tabRows } from "@/lib/staticDb";
  * GetTabsListDropDown
  * Static (offline) replacement for ManageReportR/GetTabsListDropDown.
  */
-export async function GetTabsListDropDown() {
+export async function GetTabsListDropDown(): Promise<any[]> {
 	const rows = tabRows
 		.slice()
 		.sort((a, b) => a.OrderLevel - b.OrderLevel)
@@ -21,7 +21,7 @@ export async function GetTabsListDropDown() {
  * GetArtifactListDropDown
  * Static (offline) replacement for ManageReportR/GetArtifactListDropDown.
  */
-export async function GetArtifactListDropDown() {
+export async function GetArtifactListDropDown(): Promise<any[]> {
 	return delay(artifactRows.map((row) => ({ ...row })));
 }
 
@@ -29,7 +29,7 @@ export async function GetArtifactListDropDown() {
  * GetALLReportList
  * Static (offline) replacement for ManageReportR/GetALLReportList.
  */
-export async function GetALLReportList(objClientPowerBiReportReqVM: ClientPowerBiReportReqVM) {
+export async function GetALLReportList(objClientPowerBiReportReqVM: ClientPowerBiReportReqVM): Promise<any[]> {
 	const { clientTabId, pageNo = 1, pageSize = 50, searchTxt = "" } = objClientPowerBiReportReqVM ?? {};
 	const search = String(searchTxt ?? "").trim().toLowerCase();
 
