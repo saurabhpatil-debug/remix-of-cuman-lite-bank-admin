@@ -10,17 +10,17 @@ export function PageScaffold({
   action,
   children,
 }: {
-  crumbs: Crumb[];
+  crumbs?: Crumb[] | undefined;
   eyebrow?: string | undefined;
-  title: string;
+  title?: string | undefined;
   description?: string | undefined;
   action?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div className="w-full min-w-0 max-w-full space-y-4 sm:space-y-6">
-      <Breadcrumbs items={crumbs} />
-      <PageHeader eyebrow={eyebrow} title={title} description={description} action={action} />
+      {crumbs && <Breadcrumbs items={crumbs} />}
+      {title && <PageHeader eyebrow={eyebrow} title={title} description={description} action={action} />}
       <div className="w-full min-w-0 max-w-full space-y-4 sm:space-y-6">{children}</div>
     </div>
   );

@@ -1,6 +1,6 @@
 import seedUsers from "@/data/users.json";
 import seedClients from "@/data/clients.json";
-import seedTabs from "@/data/tabs.json";
+
 import seedReports from "@/data/reports.json";
 import { deletePdfData, getPdfData, putPdfData } from "@/lib/pdfBlobs";
 
@@ -62,12 +62,15 @@ export type Session = {
 };
 
 export type Tab = {
+  orderLevel?: number;
   id: string;
   clientId: string;
   name: string;
+  reportCount?: number;
   order?: number;
   helpFile?: HelpFileRecord | null;
   createdAt: string;
+
 };
 
 export type Report = {
@@ -295,9 +298,8 @@ function readSeeded<T>(key: string, seed: T[]): T[] {
 }
 
 export function getAllTabs(): Tab[] {
-  return readSeeded<Tab>(KEYS.tabs, seedTabs as Tab[]);
+  return read<Tab[]>(KEYS.tabs, []);
 }
-
 export function getTabs(clientId: string): Tab[] {
   return getAllTabs().filter((t) => t.clientId === clientId);
 }

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import { FileText, Pencil } from "lucide-react";
 import { useClientRecords } from "@/lib/useClientRecords";
 import { Button } from "@/components/ui/button";
@@ -11,22 +11,8 @@ import {
   PageScaffold,
 } from "@/components/dashboard/PageScaffold";
 
-export const Route = createFileRoute("/dashboard/reports/$reportId/")({
-  head: () => ({
-    meta: [
-      { title: "Report Details — Client Reports Hub" },
-      { name: "description", content: "Review a report's details and its attached PDF." },
-      { property: "og:title", content: "Report Details — Client Reports Hub" },
-      { property: "og:description", content: "Review a report's details and its attached PDF." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: ReportViewPage,
-});
-
-function ReportViewPage() {
-  const { reportId } = Route.useParams();
+export default function ReportViewPage() {
+  const { reportId = "" } = useParams<{ reportId: string }>();
   const navigate = useNavigate();
   const { clientId, ready, tabs, reports } = useClientRecords();
   const report = reports.find((r) => r.id === reportId) ?? null;
@@ -34,25 +20,12 @@ function ReportViewPage() {
 
   return (
     <PageScaffold
-      crumbs={[
-        { label: "Dashboard", to: "/dashboard" },
-        { label: "Reports", to: "/dashboard/reports" },
-        { label: report ? report.reportName : "Report" },
-      ]}
-      eyebrow="Report Management"
-      title={report ? report.reportName : "Report Details"}
-      description="Read-only view of this report and its attachment."
       action={
         report ? (
           <Button
             size="sm"
             variant="outline"
-            onClick={() =>
-              navigate({
-                to: "/dashboard/reports/$reportId/edit",
-                params: { reportId: report.id },
-              })
-            }
+            onClick={() => navigate(`/dashboard/reports/${report.id}/edit`)}
           >
             <Pencil className="size-4" /> Edit
           </Button>

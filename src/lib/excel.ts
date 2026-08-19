@@ -43,9 +43,9 @@ export async function parseWorkbook(file: File): Promise<Workbook> {
 
 export function formatDate(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleDateString("en-GB", {
+  return d.toLocaleDateString("en-US", {
+    month: "2-digit",
     day: "2-digit",
-    month: "short",
     year: "numeric",
   });
 }

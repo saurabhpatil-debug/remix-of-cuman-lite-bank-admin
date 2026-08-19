@@ -1,62 +1,89 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useClientRecords } from "@/lib/useClientRecords";
 import { TabForm } from "@/components/dashboard/TabForm";
 import { InlineFormPanel } from "@/components/dashboard/InlineFormPanel";
 import { NoClientNotice, PageScaffold } from "@/components/dashboard/PageScaffold";
-import { addTab, isTabNameTaken } from "@/lib/store";
+import type { ClientTabsVM } from "@/Model/ClientTabsVM.model";
+import { CreateClientTabs } from "@/Service/manageAdminTabWService";
+import { isTabNameTaken } from "@/lib/store";
 
-export const Route = createFileRoute("/dashboard/tabs/add")({
-  head: () => ({
-    meta: [
-      { title: "Add Tab — Client Reports Hub" },
-      { name: "description", content: "Create a new report tab for the selected client." },
-      { property: "og:title", content: "Add Tab — Client Reports Hub" },
-      {
-        property: "og:description",
-        content: "Create a new report tab for the selected client.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: TabAddPage,
-});
-
-function TabAddPage() {
+export default function TabAddPage() {
   const navigate = useNavigate();
   const { clientId, ready, tabs } = useClientRecords();
-  const backToList = () => navigate({ to: "/dashboard/tabs" });
+  const backToList = () => navigate("/dashboard/tabs");
   const orderOptions = Array.from({ length: tabs.length + 1 }, (_, i) => i + 1);
 
+  const dataUrlToFile = async (dataUrl: string, fileName: string): Promise<File> => {
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+    return new File([blob], fileName, {
+      type: blob.type || "application/pdf",
+    });
+  };
+
   return (
-    <PageScaffold
-      crumbs={[
-        { label: "Dashboard", to: "/dashboard" },
-        { label: "Tabs", to: "/dashboard/tabs" },
-        { label: "Add Tab" },
-      ]}
-      eyebrow="Tab Management"
-      title="Add Tab"
-      description="Tabs group the reports for this client. Each report belongs to exactly one tab."
-    >
+    <PageScaffold>
       {clientId ? (
         <InlineFormPanel title="Add Tab" description="Give the tab a short, unique name.">
           <TabForm
             initialName=""
             orderOptions={orderOptions}
-            submitLabel="Add Tab"
+            submitLabel="Save"
             onCancel={backToList}
-            onSubmit={({ name, order, helpFile }) => {
+            onSubmit={async ({ name, order, helpFile }) => {
               if (!clientId) return false;
+
               if (isTabNameTaken(clientId, name)) {
                 toast.error("A tab with that name already exists");
                 return false;
               }
-              addTab(clientId, name, { order, helpFile });
-              toast.success("Tab added");
-              backToList();
-              return true;
+
+              try {
+                const payload: ClientTabsVM = {
+                  ClientTabsId: 0,
+                  ClientTabName: name.trim().toUpperCase(),
+                  HelpFileURL: helpFile?.fileName ?? "",
+                  PDFURL: "",
+                  FileSize: helpFile ? String(helpFile.size) : "0",
+                  RowVersion: "",
+                };
+
+                const pdfFile = helpFile
+                  ? await dataUrlToFile(helpFile.dataUrl, helpFile.fileName)
+                  : null;
+
+                await CreateClientTabs(payload, pdfFile);
+                toast.success("Tab added");
+                backToList();
+                return true;
+              } catch (error) {
+                const status =
+                  typeof (error as { response?: { status?: unknown } })?.response?.status ===
+                  "number"
+                    ? (error as { response: { status: number } }).response.status
+                    : undefined;
+                const message =
+                  typeof (error as { response?: { data?: { message?: unknown } } })?.response
+                    ?.data?.message === "string"
+                    ? (error as { response: { data: { message: string } } }).response.data
+                        .message
+                    : undefined;
+
+                if (
+                  status === 400 &&
+                  message === "Business Access Layer: Client Tab already exists."
+                ) {
+                  toast.error("Client Tab already exists.");
+                  return false;
+                }
+
+                toast.error("Could not add the tab", {
+                  description:
+                    error instanceof Error ? error.message : "Please try again.",
+                });
+                return false;
+              }
             }}
           />
         </InlineFormPanel>

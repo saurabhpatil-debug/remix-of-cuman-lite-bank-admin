@@ -1,17 +1,14 @@
-import logoAsset from "@/assets/logo.png.asset.json";
-
-export function BrandLogo({
-  className = "h-8",
-  showWordmark = true,
-}: {
+type BrandLogoProps = {
+  src?: string;
   className?: string;
-  showWordmark?: boolean;
-}) {
+};
+
+export function BrandLogo({ src, className }: BrandLogoProps) {
   return (
     <img
-      src={logoAsset.url}
-      alt="Client Reports Hub"
-      className={`${className} w-auto rounded-md object-contain ${showWordmark ? "" : "aspect-square"}`}
+      src={src || "/default-logo.png"}
+      alt="Company Logo"
+      className={className}
     />
   );
 }

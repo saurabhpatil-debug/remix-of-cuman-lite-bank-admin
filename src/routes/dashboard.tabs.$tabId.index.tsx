@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import { useClientRecords } from "@/lib/useClientRecords";
 import { Button } from "@/components/ui/button";
@@ -11,22 +11,8 @@ import {
   PageScaffold,
 } from "@/components/dashboard/PageScaffold";
 
-export const Route = createFileRoute("/dashboard/tabs/$tabId/")({
-  head: () => ({
-    meta: [
-      { title: "Tab Details — Client Reports Hub" },
-      { name: "description", content: "Review a tab and the reports assigned to it." },
-      { property: "og:title", content: "Tab Details — Client Reports Hub" },
-      { property: "og:description", content: "Review a tab and the reports assigned to it." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: TabViewPage,
-});
-
-function TabViewPage() {
-  const { tabId } = Route.useParams();
+export default function TabViewPage() {
+  const { tabId = "" } = useParams<{ tabId: string }>();
   const navigate = useNavigate();
   const { clientId, ready, tabs, reports } = useClientRecords();
   const tab = tabs.find((t) => t.id === tabId) ?? null;
@@ -34,22 +20,12 @@ function TabViewPage() {
 
   return (
     <PageScaffold
-      crumbs={[
-        { label: "Dashboard", to: "/dashboard" },
-        { label: "Tabs", to: "/dashboard/tabs" },
-        { label: tab ? tab.name : "Tab" },
-      ]}
-      eyebrow="Tab Management"
-      title={tab ? tab.name : "Tab Details"}
-      description="Read-only view of the tab and the reports it currently holds."
       action={
         tab ? (
           <Button
             size="sm"
             variant="outline"
-            onClick={() =>
-              navigate({ to: "/dashboard/tabs/$tabId/edit", params: { tabId: tab.id } })
-            }
+            onClick={() => navigate(`/dashboard/tabs/${tab.id}/edit`)}
           >
             <Pencil className="size-4" /> Edit
           </Button>
@@ -94,10 +70,7 @@ function TabViewPage() {
                       </p>
                     </div>
                     <Button asChild size="sm" variant="outline">
-                      <Link
-                        to="/dashboard/reports/$reportId"
-                        params={{ reportId: report.id }}
-                      >
+                      <Link to={`/dashboard/reports/${report.id}`}>
                         View report
                       </Link>
                     </Button>

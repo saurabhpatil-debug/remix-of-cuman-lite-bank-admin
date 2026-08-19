@@ -1,11 +1,13 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Layers, BarChart3, Menu, X, UserRound } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { clearSession, getSession, type Client } from "@/lib/store";
 import { useClientContext } from "@/lib/useClientContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { useUserInfo } from "@/framework/UserContext";
+import { AuthService } from "@/framework/auth.service";
 
 const NAV = [
   { label: "Tab Management", to: "/dashboard/tabs", icon: Layers },
@@ -13,7 +15,7 @@ const NAV = [
 ] as const;
 
 export function DashboardShell({ children }: { children: ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { client } = useClientContext();
@@ -35,8 +37,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }, []);
 
   const handleLogout = () => {
-    clearSession();
-    navigate({ to: "/" });
+    AuthService.logout();
   };
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   const isActive = (to: string) => pathname === to || pathname.startsWith(`${to}/`);
-
+  const userInfo: any = useUserInfo();
   const nav = (
     <nav className="flex flex-col gap-1 p-3">
       {NAV.map((item) => {
@@ -71,7 +72,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen w-full max-w-full bg-background">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-sidebar lg:flex">
         <div className="flex h-16 items-center border-b border-border px-5">
-          <BrandLogo className="h-12" />
+        <BrandLogo
+  src={userInfo?.LogoURL || "/default-logo.png"}
+  className="h-12"
+/>
         </div>
         {nav}
       </aside>
@@ -85,7 +89,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           />
           <aside className="relative z-10 h-full w-64 border-r border-border bg-sidebar">
             <div className="flex h-16 items-center justify-between border-b border-border px-5">
-              <BrandLogo className="h-10" />
+            <BrandLogo
+  src={userInfo?.LogoURL || "/default-logo.png"}
+  className="h-7 max-w-full sm:h-9 lg:hidden"
+/>
               <button onClick={() => setMobileOpen(false)} aria-label="Close menu">
                 <X className="size-5" />
               </button>
@@ -105,51 +112,87 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             >
               <Menu className="size-5" />
             </button>
-            <BrandLogo className="h-7 max-w-full sm:h-9 lg:hidden" />
+            <BrandLogo
+  src={userInfo?.LogoURL || "/default-logo.png"}
+  className="h-7 max-w-full sm:h-9 lg:hidden"
+/>
           </div>
 
           <Popover>
-            <PopoverTrigger asChild>
-              <button
-                className="flex shrink-0 items-center gap-2 rounded-md p-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:text-sm"
-                aria-label="Open profile menu"
-              >
-                <span className="hidden min-w-0 flex-col items-start text-left sm:flex">
-                  <span className="max-w-[7rem] truncate md:max-w-[10rem]">{orgName}</span>
-                  <span className="max-w-[7rem] truncate text-[11px] font-normal text-muted-foreground md:max-w-[10rem]">
-                    {userName}
-                  </span>
-                </span>
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <UserRound className="size-4" />
-                </span>
-              </button>
-            </PopoverTrigger>
+          <PopoverTrigger asChild>
+  <button
+    className="flex shrink-0 items-center gap-2 rounded-md p-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:text-sm"
+    aria-label="Open profile menu"
+  >
+    <span className="hidden min-w-0 flex-col items-start text-left sm:flex">
+      <span className="max-w-[7rem] truncate md:max-w-[9rem]">
+        {userInfo?.ClientName}
+      </span>
+    </span>
+
+    {/* User Initials */}
+    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#ffc0a85c] text-xs font-semibold uppercase text-[#E66A3C]">
+      {userInfo?.FirstName?.charAt(0)}
+      {userInfo?.LastName?.charAt(0)}
+    </span>
+  </button>
+</PopoverTrigger>
+            
             <PopoverContent align="end" className="w-72 p-0">
-              <div className="flex items-center gap-3 px-4 py-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <UserRound className="size-5" />
+            <div className="flex justify-between items-center gap-3 px-4 py-1">
+                <span className=" min-w-0 flex-col items-start text-left sm:flex">
+                  <span className="max-w-[7rem] truncate md:max-w-[9rem]">{userInfo?.ClientName}</span>
+                 
                 </span>
+                <button
+                onClick={handleLogout}
+                className="flex  items-end gap-3 cursor-pointer px-4 py-3 text-sm  transition-colors "
+              >
+                <span>Sign out</span>
+              </button>
+            </div>
+              
+               <div className="flex items-start gap-3 px-5 pb-4">
+                <div
+                  className="
+            flex
+            h-12
+            w-12
+            shrink-0
+            items-center
+            justify-center
+            rounded-full
+            bg-[#dce8f8]
+            text-lg
+            font-medium
+            text-[#173b6d]
+          "
+                >
+                  {userInfo?.FirstName?.charAt(0)}
+                  {userInfo?.LastName?.charAt(0)}
+                </div>
+
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
-                  <p className="truncate text-xs text-muted-foreground">{userRole}</p>
-                  <p className="truncate text-xs text-muted-foreground">{email || "—"}</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {userInfo?.FirstName} {userInfo?.LastName}
+                  </p>
+
+                  <p className="mt-1 truncate text-sm text-gray-700">
+                    {userInfo?.Email}
+                  </p>
+
+
                 </div>
               </div>
 
               <Separator />
 
-              <button
-                onClick={handleLogout}
-                className="flex w-full items-center gap-3 px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              >
-                <span>Sign out</span>
-              </button>
+              
             </PopoverContent>
           </Popover>
         </header>
 
-        <main className="min-w-0 max-w-full flex-1 px-3 py-4 sm:px-6 sm:py-6 lg:px-10 lg:py-10">
+        <main className="min-w-0 max-w-full flex-1 px-3 py-4 sm:px-6 sm:py-6 lg:px-5 lg:py-5">
           <div className="w-full max-w-full space-y-4 sm:space-y-6 lg:space-y-8">{children}</div>
         </main>
       </div>

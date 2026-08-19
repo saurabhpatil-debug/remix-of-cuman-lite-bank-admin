@@ -2,7 +2,7 @@
 
 A responsive admin dashboard for managing clients, report tabs, Power BI configurations, and PDF attachments.
 
-Built with React, TypeScript, TanStack Start, and Tailwind CSS.
+Built with React, TypeScript, Vite, React Router DOM, and Tailwind CSS.
 
 ## Features
 

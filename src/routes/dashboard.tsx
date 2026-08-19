@@ -1,11 +1,7 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Outlet } from "react-router-dom";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
-export const Route = createFileRoute("/dashboard")({
-  component: DashboardLayout,
-});
-
-function DashboardLayout() {
+export default function DashboardLayout() {
   return (
     <DashboardShell>
       <Outlet />

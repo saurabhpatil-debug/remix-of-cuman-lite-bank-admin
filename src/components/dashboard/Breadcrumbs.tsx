@@ -1,7 +1,15 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 
 export type Crumb = { label: string; to?: string; params?: Record<string, string> };
+
+function withParams(path: string, params?: Record<string, string>) {
+  if (!params) return path;
+  return Object.entries(params).reduce(
+    (acc, [key, value]) => acc.replace(`$${key}`, encodeURIComponent(value)),
+    path,
+  );
+}
 
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
   return (
@@ -13,8 +21,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
             <li key={`${item.label}-${i}`} className="flex min-w-0 items-center gap-1">
               {item.to && !last ? (
                 <Link
-                  to={item.to}
-                  params={item.params as never}
+                  to={withParams(item.to, item.params)}
                   className="truncate transition-colors hover:text-foreground"
                 >
                   {item.label}

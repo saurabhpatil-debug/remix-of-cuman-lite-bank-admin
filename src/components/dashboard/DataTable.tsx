@@ -12,7 +12,7 @@ import {
 
 export type Column<T> = {
   key: string;
-  header: string;
+  header: ReactNode;
   render?: (row: T) => ReactNode;
   className?: string;
   width?: string;
@@ -27,17 +27,19 @@ type Props<T> = {
   getRowKey: (row: T, index: number) => string;
   minWidth?: string;
   headerClassName?: string;
+  onPageSizeChange?: (size: number) => void;
 };
 
 export function DataTable<T extends Record<string, unknown>>({
   columns,
   rows,
   searchPlaceholder = "Search…",
-  pageSize = 10,
+  pageSize = 50,
   emptyMessage = "No records found.",
   getRowKey,
   minWidth,
   headerClassName,
+  onPageSizeChange,
 }: Props<T>) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -69,36 +71,33 @@ export function DataTable<T extends Record<string, unknown>>({
 
   return (
     <div className="space-y-4">
-      <div className="relative w-full max-w-full sm:max-w-sm">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPage(1);
-          }}
-          placeholder={searchPlaceholder}
-          className="w-full pl-9 text-sm"
-          aria-label="Search table"
-        />
-      </div>
+    
 
       <div className="max-h-[70vh] w-full max-w-full overflow-auto rounded-xl border border-border bg-card">
-        <table
-          className="w-full table-fixed text-xs sm:text-sm"
-          style={{ minWidth: tableMinWidth }}
-        >
-          <colgroup>
-            {columns.map((col) => (
-              <col key={col.key} style={col.width ? { width: col.width } : undefined} />
-            ))}
-          </colgroup>
+      <table
+  className="w-full min-w-[850px] table-fixed text-xs sm:min-w-0 sm:text-sm"
+  style={{
+    width: "100%",
+    minWidth: minWidth ?? undefined,
+  }}
+>
+<colgroup>
+  {columns.map((col) => (
+    <col
+      key={col.key}
+      style={col.width ? { width: col.width } : undefined}
+    />
+  ))}
+</colgroup>
           <thead className="sticky top-0 z-10">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`bg-secondary px-2.5 py-2.5 text-left align-middle whitespace-nowrap shadow-[inset_0_-1px_0_0_var(--border)] sm:px-3 ${headerClassName ?? "text-[10px] font-semibold tracking-normal text-muted-foreground uppercase sm:text-[11px]"} ${col.className ?? ""}`}
+                  className={`bg-secondary px-2.5 py-2.5 text-left align-middle shadow-[inset_0_-1px_0_0_var(--border)] sm:px-3 ${
+                    headerClassName ??
+                    "text-[10px] font-semibold tracking-normal text-muted-foreground uppercase sm:text-[11px]"
+                  } ${col.className ?? ""}`}
                 >
                   {col.header}
                 </th>
@@ -123,11 +122,15 @@ export function DataTable<T extends Record<string, unknown>>({
                 >
                   {columns.map((col) => (
                     <td
-                      key={col.key}
-                      className={`px-2.5 py-2.5 align-middle break-words sm:px-3 ${col.className ?? ""}`}
-                    >
-                      {col.render ? col.render(row) : String(row[col.key] ?? "")}
-                    </td>
+                    key={col.key}
+                    className={`min-w-0 overflow-hidden px-2.5 py-2.5 align-middle break-words sm:px-3 ${
+                      col.className ?? ""
+                    }`}
+                  >
+                    {col.render
+                      ? col.render(row)
+                      : String(row[col.key] ?? "")}
+                  </td>
                   ))}
                 </tr>
               ))
@@ -141,17 +144,31 @@ export function DataTable<T extends Record<string, unknown>>({
         className="flex flex-wrap items-center justify-end gap-x-4 gap-y-3 text-xs text-muted-foreground sm:text-sm"
       >
         <div className="flex min-w-0 items-center gap-2">
-          <span className="shrink-0 text-primary">Items per page</span>
+          <span className="shrink-0 ">Records per page</span>
           <Select
             value={String(size)}
             onValueChange={(value) => {
-              setSize(Number(value));
+              const newSize = Number(value);
+              setSize(newSize);
               setPage(1);
+              onPageSizeChange?.(newSize);
             }}
           >
             <SelectTrigger
-              className="h-9 w-[4.75rem] shrink-0 border-primary/60 text-foreground"
-              aria-label="Items per page"
+              className="
+              h-8 w-[72px]
+              border-[#E66A3C]/50
+              text-[#E66A3C]
+              hover:border-[#E66A3C]
+              focus:border-[#E66A3C]
+              focus:outline-none
+              focus:ring-0
+              focus-visible:outline-none
+              focus-visible:ring-0
+              focus-visible:ring-offset-0
+              shadow-none
+            "
+              aria-label="Records per page"
             >
               <SelectValue />
             </SelectTrigger>
